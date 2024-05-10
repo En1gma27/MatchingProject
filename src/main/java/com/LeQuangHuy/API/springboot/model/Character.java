@@ -21,13 +21,13 @@ public class Character {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-
-
 	@JsonProperty("character_name") // Xác định tên trường trong JSON trả về
 	private String characterName;
 
-	@JsonProperty("UserID") // Xác định tên trường trong JSON trả về
-	private String user_id;
+	@JsonIgnore // Không xuất hiện trong response body
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "user_id")
+	private User user;
 
 	@JsonIgnore // Không xuất hiện trong response body
 	@Column(name = "created_at")
