@@ -40,6 +40,10 @@ public class User {
 	@Enumerated(EnumType.STRING)
 	private UserRole userRole;
 
+	@JsonIgnore
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+	private List<Character> characters = new ArrayList<>();
+
 	@JsonIgnore // Không xuất hiện trong request body
 	@Column(name = "created_at")
 	private LocalDateTime createdAt;
