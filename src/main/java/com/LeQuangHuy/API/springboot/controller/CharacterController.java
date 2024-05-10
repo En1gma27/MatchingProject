@@ -1,6 +1,8 @@
 package com.LeQuangHuy.API.springboot.controller;
 
 import com.LeQuangHuy.API.springboot.model.Character;
+import com.LeQuangHuy.API.springboot.model.User;
+import com.LeQuangHuy.API.springboot.security.service.UserService;
 import com.LeQuangHuy.API.springboot.service.CharacterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,10 +18,11 @@ public class CharacterController {
 
     @Autowired
     private CharacterService characterService;
-
-    public CharacterController(CharacterService characterService) {
+    private UserService userService;
+    public CharacterController(CharacterService characterService,UserService userService) {
 
         this.characterService = characterService;
+        this.userService = userService;
     }
     @GetMapping
     public List<Character> getCharacter(@RequestParam(required = false) String character_name) {
@@ -32,7 +35,7 @@ public class CharacterController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Character> updateBook(@PathVariable Long id, @RequestBody Character updatedCharacter) {
-        // Call the service method to update the User
+        // goi service method de ypdate User
         Optional<Character> existingCharacterOptional = characterService.getCharacterById(id);
         if (existingCharacterOptional.isPresent()) {
             Character existingCharacter = existingCharacterOptional.get();
@@ -49,20 +52,32 @@ public class CharacterController {
     public void deleteUserById(@PathVariable Long id) {
         characterService.deleteCharacterById(id);
     }
+
     @PostMapping("/characters")
     public ResponseEntity<Character> createCharacter(@RequestParam Long id,
                                                      @RequestParam String characterName,
-                                                     @RequestParam String userId) {
+                                                     @RequestParam Long userId) {
         // Tạo một đối tượng Character mới
         Character character = new Character();
         character.setId(id);
         character.setCharacterName(characterName);
-        character.setUser_id(userId);
 
-        // Lưu Character vào cơ sở dữ liệu
-        Character savedCharacter = characterService.saveCharacter(character);
+        // Lấy thông tin User từ userId
+        Optional<User> userOptional = userService.getUserById(userId);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
 
-        // Trả về Character đã lưu trong phản hồi
-        return ResponseEntity.ok(savedCharacter);
+            // Liên kết character với user
+            character.setUser(user);
+
+            // Lưu Character vào cơ sở dữ liệu
+            Character savedCharacter = characterService.saveCharacter(character);
+
+            // Trả về Character đã lưu trong phản hồi
+            return ResponseEntity.ok(savedCharacter);
+        } else {
+            // Nếu không tìm thấy user, trả về ResponseEntity.notFound()
+            return ResponseEntity.notFound().build();
+        }
     }
 }
