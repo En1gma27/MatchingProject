@@ -1,101 +1,80 @@
 package com.LeQuangHuy.API.springboot.security.service;
 
-
-import com.LeQuangHuy.API.springboot.service.UserValidationService;
 import com.LeQuangHuy.API.springboot.model.User;
-import com.LeQuangHuy.API.springboot.model.UserRole;
+import com.LeQuangHuy.API.springboot.repository.UserRepository;
 import com.LeQuangHuy.API.springboot.security.dto.AuthenticatedUserDto;
 import com.LeQuangHuy.API.springboot.security.dto.RegistrationRequest;
 import com.LeQuangHuy.API.springboot.security.dto.RegistrationResponse;
-import com.LeQuangHuy.API.springboot.security.mapper.UserMapper;
-import com.LeQuangHuy.API.springboot.utils.GeneralMessageAccessor;
-import com.LeQuangHuy.API.springboot.repository.UserRepository;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.Optional;
 
-@Slf4j
 @Service
-
-
 public class UserServiceImpl implements UserService {
-
-	private static final String REGISTRATION_SUCCESSFUL = "registration_successful";
 
 	private final UserRepository userRepository;
 
-	private final BCryptPasswordEncoder bCryptPasswordEncoder;
-
-	private final UserValidationService userValidationService;
-
-	private final GeneralMessageAccessor generalMessageAccessor;
-
-
-	// Constructor
-	public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder, UserValidationService userValidationService, GeneralMessageAccessor generalMessageAccessor) {
+	public UserServiceImpl(UserRepository userRepository) {
 		this.userRepository = userRepository;
-        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-        this.userValidationService = userValidationService;
-        this.generalMessageAccessor = generalMessageAccessor;
-    }
+	}
 
+	@Override
+	public Optional<User> getUserById(Long id) {
+		return Optional.empty();
+	}
 
+	@Override
+	public ResponseEntity<User> findByUsername(String username) {
+		User user = userRepository.findByUsername(username);
+		if (user != null) {
+			return ResponseEntity.ok(user);
+		} else {
+			return ResponseEntity.notFound().build();
+		}
+	}
 
 	@Override
 	public RegistrationResponse registration(RegistrationRequest registrationRequest) {
-		userValidationService.validateUser(registrationRequest);
-
-		final User user = UserMapper.INSTANCE.convertToUser(registrationRequest);
-		user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-		user.setUserRole(UserRole.USER);
-
-		userRepository.save(user);
-
-		final String username = registrationRequest.getUsername();
-		final String registrationSuccessMessage = generalMessageAccessor.getMessage(null, REGISTRATION_SUCCESSFUL, username);
-
-		log.info("{} registered successfully!", username);
-
-		return new RegistrationResponse(registrationSuccessMessage);
+		return null;
 	}
 
 	@Override
 	public AuthenticatedUserDto findAuthenticatedUserByUsername(String username) {
-		final User user = findByUsername(username);
-		return UserMapper.INSTANCE.convertToAuthenticatedUserDto(user);
+		return null;
 	}
 
 	@Override
-	public List<User> getAllUsers() {
+	public ResponseEntity<User> updateUser(Long id, User updatedUser) {
 
-		return userRepository.findAll();
+
+        Optional<User> existingUserOptional = userRepository.findById(id);
+        if (existingUserOptional.isPresent()) {
+            User existingUser = existingUserOptional.get();
+			existingUser.setEmail(updatedUser.getEmail());
+			existingUser.setUsername(updatedUser.getUsername());
+			existingUser.setUserRole(updatedUser.getUserRole());
+			existingUser.setAddress(updatedUser.getAddress());
+			existingUser.setType(updatedUser.getType());
+			User savedUser = userRepository.save(existingUser);
+            return ResponseEntity.ok(savedUser);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
 	}
-
 	@Override
 	public void deleteUserById(Long id) {
-
 		userRepository.deleteById(id);
-	}
-	@Override
-	public Optional<User> getUserById(Long id) {
-
-		return userRepository.findById(id);
-	}
-
-	@Override
-	public User findByUsername(String username) {
-
-		return userRepository.findByUsername(username);
 	}
 
 	@Override
 	public User saveUser(User user) {
-		// Thực hiện lưu hoặc cập nhật thông tin người dùng vào cơ sở dữ liệu
-		return userRepository.save(user);
+		return null;
 	}
 
-
-
+	@Override
+	public List<User> getAllUsers() {
+		return userRepository.findAll();
+	}
 }

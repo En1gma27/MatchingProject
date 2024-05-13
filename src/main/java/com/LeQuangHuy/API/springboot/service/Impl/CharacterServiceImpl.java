@@ -1,56 +1,65 @@
 package com.LeQuangHuy.API.springboot.service.Impl;
+
+import com.LeQuangHuy.API.springboot.dto.CharacterDTO;
+import com.LeQuangHuy.API.springboot.mapper.CharacterMapper;
 import com.LeQuangHuy.API.springboot.model.Character;
 import com.LeQuangHuy.API.springboot.repository.CharacterRepository;
-
 import com.LeQuangHuy.API.springboot.service.CharacterService;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
-@Slf4j
 @Service
-@RequiredArgsConstructor
-
 public class CharacterServiceImpl implements CharacterService {
 
-
-
 	private final CharacterRepository characterRepository;
+	private final CharacterMapper characterMapper;
 
-
-
-
-
-
-
-
+	@Autowired
+	public CharacterServiceImpl(CharacterRepository characterRepository, CharacterMapper characterMapper) {
+		this.characterRepository = characterRepository;
+		this.characterMapper = characterMapper;
+	}
 
 	@Override
-	public List<Character> getAllCharacter() {
-		return characterRepository.findAll();
+	public List<CharacterDTO> getAllCharacters() {
+		List<Character> characters = characterRepository.findAll();
+		return characters.stream().map(characterMapper::characterToDTO).collect(Collectors.toList());
 	}
+
+	@Override
+	public List<CharacterDTO> findByCharacterName(String characterName) {
+		List<Character> characters = characterRepository.findByCharacterName(characterName);
+		return characters.stream().map(characterMapper::characterToDTO).collect(Collectors.toList());
+	}
+
+	@Override
+	public CharacterDTO updateCharacter(Long id, CharacterDTO updatedCharacterDTO) {
+		Character existingCharacter = characterRepository.findById(id).orElse(null);
+		if (existingCharacter != null) {
+			existingCharacter.setCharacterName(updatedCharacterDTO.getCharacterName());
+			Character savedCharacter = characterRepository.save(existingCharacter);
+			return characterMapper.characterToDTO(savedCharacter);
+		} else {
+			return null;
+		}
+	}
+
 
 	@Override
 	public void deleteCharacterById(Long id) {
 		characterRepository.deleteById(id);
 	}
-	@Override
-	public Optional<Character> getCharacterById(Long id) {
-		return characterRepository.findById(id);
-	}
 
 	@Override
-	public List<Character> findBycharacterName(String character_name) {
-		return (List<Character>) characterRepository.findBycharacterName(character_name);
+	public CharacterDTO saveCharacter(CharacterDTO characterDTO) {
+		Character characterToSave = characterMapper.toEntity(characterDTO);
+		Character savedCharacter = characterRepository.save(characterToSave);
+		return characterMapper.characterToDTO(savedCharacter);
 	}
 
-	@Override
-	public Character saveCharacter(Character character) {
-		// Thực hiện lưu hoặc cập nhật thông tin người dùng vào cơ sở dữ liệu
-		return characterRepository.save(character);
-	}
+
 
 }

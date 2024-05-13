@@ -8,7 +8,7 @@ import lombok.ToString;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 
-// rimmel asghar
+
 @Getter
 @Setter
 @ToString

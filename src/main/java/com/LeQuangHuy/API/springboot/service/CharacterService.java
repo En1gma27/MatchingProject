@@ -1,27 +1,18 @@
 package com.LeQuangHuy.API.springboot.service;
 
-import com.LeQuangHuy.API.springboot.model.Character;
-
-import org.springframework.stereotype.Service;
+import com.LeQuangHuy.API.springboot.dto.CharacterDTO;
 
 import java.util.List;
-import java.util.Optional;
 
-@Service
 public interface CharacterService {
 
-    Optional<Character> getCharacterById(Long id);
+	List<CharacterDTO> getAllCharacters();
 
-	List<Character> findBycharacterName(String character_name );
+	List<CharacterDTO> findByCharacterName(String characterName);
 
-
-
-	List<Character> getAllCharacter();
+	CharacterDTO updateCharacter(Long id, CharacterDTO updatedCharacterDTO);
 
 	void deleteCharacterById(Long id);
 
-	Character saveCharacter(Character character);
-
-
-
+	CharacterDTO saveCharacter(CharacterDTO characterDTO);
 }

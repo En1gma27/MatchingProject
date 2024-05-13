@@ -8,8 +8,7 @@ import java.util.List;
 
 public interface CharacterRepository extends JpaRepository<Character, Long> {
 
-	List<Character> findBycharacterName (String character_name);
-
+	List<Character> findByCharacterName (String character_name);
 
 
 }

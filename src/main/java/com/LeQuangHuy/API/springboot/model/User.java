@@ -6,6 +6,8 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Getter
@@ -18,6 +20,7 @@ public class User {
 	@JsonIgnore // Không xuất hiện trong request body
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+
 	private Long id;
 
 	@JsonProperty("user_name")
@@ -35,10 +38,19 @@ public class User {
 	@JsonProperty("address")
 	private String address;
 
+	@JsonProperty("Type")
+	private String type;
+
 
 	@JsonProperty("userRole")
 	@Enumerated(EnumType.STRING)
 	private UserRole userRole;
+
+	@JsonIgnore
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+	private List<Character> characters = new ArrayList<>();
+
+
 
 	@JsonIgnore // Không xuất hiện trong request body
 	@Column(name = "created_at")

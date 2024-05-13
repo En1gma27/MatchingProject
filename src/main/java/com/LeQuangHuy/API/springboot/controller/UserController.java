@@ -1,56 +1,43 @@
 package com.LeQuangHuy.API.springboot.controller;
 
-
 import com.LeQuangHuy.API.springboot.model.User;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.LeQuangHuy.API.springboot.security.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.LeQuangHuy.API.springboot.security.service.UserService;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/users")
 public class UserController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
     public UserController(UserService userService) {
-
         this.userService = userService;
     }
+
     @GetMapping
-    public ResponseEntity<?> getUsers(@RequestParam(required = false) String name) {
+    public ResponseEntity<List<User>> getUsers(@RequestParam(required = false) String name) {
         if (name != null && !name.isEmpty()) {
-            User user = userService.findByUsername(name);
+            User user = userService.findByUsername(name).getBody();
             if (user != null) {
-                return ResponseEntity.ok(Collections.singletonList(user));
+                return ResponseEntity.ok(List.of(user));
             } else {
                 return ResponseEntity.notFound().build();
             }
         } else {
-            return ResponseEntity.ok(userService.getAllUsers());
+            List<User> users = userService.getAllUsers();
+            return ResponseEntity.ok(users);
         }
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User updatedUser) {
-        // Call the service method to update the User
-        Optional<User> existingUserOptional = userService.getUserById(id);
-        if (existingUserOptional.isPresent()) {
-            User existingUser = existingUserOptional.get();
-            existingUser.setEmail(updatedUser.getEmail());
-            existingUser.setUsername(updatedUser.getUsername());
-            existingUser.setUserRole(updatedUser.getUserRole());
-            existingUser.setAddress(updatedUser.getAddress());
-            User savedUser = userService.saveUser(existingUser);
-            return ResponseEntity.ok(savedUser);
+        ResponseEntity<User> responseEntity = userService.updateUser(id, updatedUser);
+        if (responseEntity != null && responseEntity.getBody() != null) {
+            return ResponseEntity.ok(responseEntity.getBody());
         } else {
-
             return ResponseEntity.notFound().build();
         }
     }
