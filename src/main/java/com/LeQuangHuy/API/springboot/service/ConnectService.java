@@ -1,21 +1,20 @@
-//package com.LeQuangHuy.API.springboot.service;
-//
-//import com.LeQuangHuy.API.springboot.model.Connect;
-//import org.springframework.stereotype.Service;
-//
-//import java.util.List;
-//import java.util.Optional;
-//
-//@Service
-//public interface ConnectService {
-//
-//    Optional<Connect> getConnectById(Long id);
-//
-//	List<Connect> findConnectByUserID(Long UserId );
-//
-//	List<Connect> getAllConnect();
-//
-//	void deleteConnectrById(Long id);
-//
-//	Connect saveConnect(Connect connect);
-//}
+package com.LeQuangHuy.API.springboot.service;
+import com.LeQuangHuy.API.springboot.dto.ConnectDTO;
+import java.util.List;
+public interface ConnectService {
+
+    List<ConnectDTO> getAllConnect();
+
+    List<ConnectDTO> findByUserId(Long userId);
+
+    List<ConnectDTO> findByType(String type);
+
+    List<ConnectDTO> findByUserIdAndType(Long userId, String type);
+
+    ConnectDTO updateConnect(Long id, ConnectDTO updatedConnectDTO);
+
+
+    void deleteConnectById(Long id);
+
+    ConnectDTO saveConnect(ConnectDTO connectDTO);
+}
