@@ -44,6 +44,16 @@ public class User {
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
 	private List<Character> characters = new ArrayList<>();
 
+	
+	@JsonIgnore
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+	private List<Connect> connects = new ArrayList<>();
+
+
+	@JsonIgnore
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+	private List<FeedBack> feedBacks = new ArrayList<>();
+
 	@JsonIgnore // Không xuất hiện trong request body
 	@Column(name = "created_at")
 	private LocalDateTime createdAt;
