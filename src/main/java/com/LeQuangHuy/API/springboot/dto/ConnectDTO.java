@@ -8,8 +8,7 @@ import org.mapstruct.Mapper;
 // ConnectDTO.java
 @Getter
 @Setter
-public class ConnectDTO {
-    private Long id;
+public class ConnectDTO extends BaseDTO {
     private String type;
     private String status;
     private String groupName;
