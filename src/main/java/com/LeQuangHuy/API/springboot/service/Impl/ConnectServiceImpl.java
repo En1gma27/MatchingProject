@@ -24,45 +24,51 @@ public class ConnectServiceImpl implements ConnectService {
     }
 
     @Override
-    public List<ConnectDTO> getAllConnect() {
+    public List<ConnectDTO> getAll() {
         List<Connect> connects = connectRepository.findAll();
-        return connects.stream().map(connectMapper::connectToDTO ).collect(Collectors.toList());
+        return connects.stream().map(connectMapper::entityToDTO ).collect(Collectors.toList());
+    }
+
+    @Override
+    public ConnectDTO findById(Long id) {
+        return null;
+    }
+
+    @Override
+    public ConnectDTO update(Long id, ConnectDTO updatedDTO) {
+        return null;
     }
 
     @Override
     public List<ConnectDTO> findByUserId(Long userId) {
         List<Connect> connects = connectRepository.findByUserId(userId);
-        return connects.stream().map(connectMapper::connectToDTO).collect(Collectors.toList());
+        return connects.stream().map(connectMapper::entityToDTO).collect(Collectors.toList());
     }
 
     @Override
     public List<ConnectDTO> findByType(String type) {
         return connectRepository.findByType(type).stream()
-                .map(connectMapper::connectToDTO)
+                .map(connectMapper::entityToDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<ConnectDTO> findByUserIdAndType(Long userId, String type) {
         return connectRepository.findByUserIdAndType(userId,type).stream()
-                .map(connectMapper::connectToDTO)
+                .map(connectMapper::entityToDTO)
                 .collect(Collectors.toList());
     }
-    @Override
 
-    public ConnectDTO updateConnect(Long id, ConnectDTO updatedConnectDTO) {
-        return null;
-    }
 
     @Override
-    public void deleteConnectById(Long id) {
+    public void deleteById(Long id) {
         connectRepository.deleteById(id);
     }
 
     @Override
-    public ConnectDTO saveConnect(ConnectDTO connectDTO) {
-        Connect connectToSave = connectMapper.toEntity(connectDTO);
+    public ConnectDTO save(ConnectDTO connectDTO) {
+        Connect connectToSave = connectMapper.dtoToEntity(connectDTO);
         Connect savedConnect = connectRepository.save(connectToSave);
-        return connectMapper.connectToDTO(savedConnect);
+        return connectMapper.entityToDTO(savedConnect);
     }
 }
