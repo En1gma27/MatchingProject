@@ -18,11 +18,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "connects")
-public class Connect {
-    @JsonIgnore // Không xuất hiện trong request body
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Connect extends BaseModel {
+
 
 
     @JsonProperty("type") // Xác định tên trường trong JSON trả về
@@ -45,22 +42,10 @@ public class Connect {
     private Long userId2;
 
 
-    @JsonIgnore // Không xuất hiện trong response body
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
-
-    // Phương thức PrePersist để tự động cập nhật createdAt trước khi lưu vào cơ sở dữ liệu
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-    }
-
     @JsonIgnore
     @OneToMany(mappedBy = "connect", cascade = CascadeType.ALL)
     private List<FeedBack> feedBacks = new ArrayList<>();
 
-    @JsonIgnore // Không xuất hiện trong response body
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+
 
 }
