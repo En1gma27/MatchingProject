@@ -7,41 +7,19 @@ import lombok.*;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-import javax.persistence.*;
-import java.time.LocalDateTime;
-
 @Getter
 @Setter
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "characters")
-public class Character {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+public class Character extends BaseModel {
 
-	@JsonProperty("character_name") // Xác định tên trường trong JSON trả về
+	@JsonProperty("character_name")
 	private String characterName;
 
-	@JsonIgnore // Không xuất hiện trong response body
+	@JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id")
 	private User user;
-
-	@JsonIgnore // Không xuất hiện trong response body
-	@Column(name = "created_at")
-	private LocalDateTime createdAt;
-
-	// Phương thức PrePersist để tự động cập nhật createdAt trước khi lưu vào cơ sở dữ liệu
-	@PrePersist
-	protected void onCreate() {
-		createdAt = LocalDateTime.now();
-	}
-
-	@JsonIgnore // Không xuất hiện trong response body
-	@Column(name = "updated_at")
-	private LocalDateTime updatedAt;
-
-
 }
