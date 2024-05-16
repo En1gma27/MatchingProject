@@ -1,8 +1,7 @@
 package com.LeQuangHuy.API.springboot.controller;
 
-import com.LeQuangHuy.API.springboot.dto.CharacterDTO;
+
 import com.LeQuangHuy.API.springboot.dto.ConnectDTO;
-import com.LeQuangHuy.API.springboot.service.CharacterService;
 import com.LeQuangHuy.API.springboot.service.ConnectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -29,20 +28,20 @@ public class ConnectController {
         } else if (type != null) {
             return connectService.findByType(type);
         } else {
-            return connectService.getAllConnect();
+            return connectService.getAll();
         }
     }
 
     @PostMapping("/connects")
     public ResponseEntity<ConnectDTO> createConnect(@RequestBody ConnectDTO connectDTO) {
-        ConnectDTO savedConnectDTO = connectService.saveConnect(connectDTO);
+        ConnectDTO savedConnectDTO = connectService.save(connectDTO);
         return ResponseEntity.ok(savedConnectDTO);
     }
 
 
     @DeleteMapping("/{id}")
     public void deleteConnectById(@PathVariable Long id) {
-        connectService.deleteConnectById(id);
+        connectService.deleteById(id);
     }
 
 }
