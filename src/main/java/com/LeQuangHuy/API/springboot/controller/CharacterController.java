@@ -24,13 +24,13 @@ public class CharacterController {
         if (characterName != null && !characterName.isEmpty()) {
             return characterService.findByCharacterName(characterName);
         } else {
-            return characterService.getAllCharacters();
+            return characterService.getAll();
         }
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<CharacterDTO> updateCharacter(@PathVariable Long id, @RequestBody CharacterDTO updatedCharacterDTO) {
-        CharacterDTO savedCharacterDTO = characterService.updateCharacter(id, updatedCharacterDTO);
+        CharacterDTO savedCharacterDTO = characterService.update(id, updatedCharacterDTO);
         if (savedCharacterDTO != null) {
             return ResponseEntity.ok(savedCharacterDTO);
         } else {
@@ -40,12 +40,12 @@ public class CharacterController {
 
     @DeleteMapping("/{id}")
     public void deleteCharacterById(@PathVariable Long id) {
-        characterService.deleteCharacterById(id);
+        characterService.deleteById(id);
     }
 
     @PostMapping("/characters")
     public ResponseEntity<CharacterDTO> createCharacter(@RequestBody CharacterDTO characterDTO) {
-        CharacterDTO savedCharacterDTO = characterService.saveCharacter(characterDTO);
+        CharacterDTO savedCharacterDTO = characterService.save(characterDTO);
         return ResponseEntity.ok(savedCharacterDTO);
     }
 }
