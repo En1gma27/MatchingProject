@@ -1,9 +1,10 @@
 package com.LeQuangHuy.API.springboot.service;
+import com.LeQuangHuy.API.springboot.dto.CharacterDTO;
 import com.LeQuangHuy.API.springboot.dto.ConnectDTO;
 import java.util.List;
-public interface ConnectService {
+public interface ConnectService extends BaseService<ConnectDTO>  {
 
-    List<ConnectDTO> getAllConnect();
+
 
     List<ConnectDTO> findByUserId(Long userId);
 
@@ -11,10 +12,4 @@ public interface ConnectService {
 
     List<ConnectDTO> findByUserIdAndType(Long userId, String type);
 
-    ConnectDTO updateConnect(Long id, ConnectDTO updatedConnectDTO);
-
-
-    void deleteConnectById(Long id);
-
-    ConnectDTO saveConnect(ConnectDTO connectDTO);
 }
