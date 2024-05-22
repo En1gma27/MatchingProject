@@ -1,8 +1,13 @@
 package com.LeQuangHuy.API.springboot.controller;
 
 import com.LeQuangHuy.API.springboot.dto.CharacterDTO;
+import com.LeQuangHuy.API.springboot.filter.CharacterFilter;
+import com.LeQuangHuy.API.springboot.model.Character; // Thay đổi ở đây
 import com.LeQuangHuy.API.springboot.service.CharacterService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,42 +15,27 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/characters")
-public class CharacterController {
+public class CharacterController extends BaseController<CharacterDTO, CharacterFilter, Character, Long> { // Thay đổi ở đây
 
     private final CharacterService characterService;
 
     @Autowired
     public CharacterController(CharacterService characterService) {
+        super(characterService);
         this.characterService = characterService;
     }
 
     @GetMapping
-    public List<CharacterDTO> getCharacters(@RequestParam(required = false) String characterName) {
-        if (characterName != null && !characterName.isEmpty()) {
-            return characterService.findByCharacterName(characterName);
+    public Page<CharacterDTO> getConnects(
+            @RequestParam(required = false) Long userId,
+            @RequestParam(required = false) String characterName,
+            Pageable pageable) {
+        if (userId != null || characterName != null) {
+            return characterService.findWithFilter(pageable, userId, characterName);
         } else {
-            return characterService.getAll();
+            List<CharacterDTO> allCharacters = characterService.getAll();
+            return new PageImpl<>(allCharacters, pageable, allCharacters.size());
         }
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<CharacterDTO> updateCharacter(@PathVariable Long id, @RequestBody CharacterDTO updatedCharacterDTO) {
-        CharacterDTO savedCharacterDTO = characterService.update(id, updatedCharacterDTO);
-        if (savedCharacterDTO != null) {
-            return ResponseEntity.ok(savedCharacterDTO);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
-    @DeleteMapping("/{id}")
-    public void deleteCharacterById(@PathVariable Long id) {
-        characterService.deleteById(id);
-    }
-
-    @PostMapping("/characters")
-    public ResponseEntity<CharacterDTO> createCharacter(@RequestBody CharacterDTO characterDTO) {
-        CharacterDTO savedCharacterDTO = characterService.save(characterDTO);
-        return ResponseEntity.ok(savedCharacterDTO);
-    }
 }
