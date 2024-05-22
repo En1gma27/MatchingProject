@@ -1,12 +1,18 @@
-package com.LeQuangHuy.API.springboot.service;
+package com.LeQuangHuy.API.springboot.mapper;
+
 import com.LeQuangHuy.API.springboot.dto.CharacterDTO;
-import com.LeQuangHuy.API.springboot.filter.CharacterFilter;
+import com.LeQuangHuy.API.springboot.mapper.BaseMapper;
 import com.LeQuangHuy.API.springboot.model.Character;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
-public interface CharacterService extends BaseService<CharacterDTO, CharacterFilter, Character, Long> {
+@Mapper(componentModel = "spring")
+public interface CharacterMapper extends BaseMapper<Character, CharacterDTO> {
 
-    Page<CharacterDTO> findWithFilter(Pageable pageable, Long userId, String characterName);
+    @Override
+    @Mapping(source = "user.id", target = "userId")
+    CharacterDTO entityToDTO(Character character);
 
+    @Override
+    Character dtoToEntity(CharacterDTO dto);
 }
