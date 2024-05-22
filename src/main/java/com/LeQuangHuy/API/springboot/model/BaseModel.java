@@ -27,9 +27,9 @@ public class BaseModel {
 
     @Column(name = "created_at", nullable = false, updatable = false)
     @CreationTimestamp
-    private LocalDateTime createdAt; // Sử dụng kiểu LocalDateTime
+    private Instant createdAt;
 
     @Column(name = "updated_at", nullable = false)
     @UpdateTimestamp
-    private LocalDateTime updatedAt; // Sử dụng kiểu LocalDateTime
+    private Instant updatedAt;
 }
