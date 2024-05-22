@@ -19,15 +19,20 @@ public class ConnectController {
         this.connectService = connectService;
     }
 
-    @GetMapping
+     @GetMapping
     public Page<ConnectDTO> getConnects(
             @RequestParam(required = false) Long userId,
             @RequestParam(required = false) Long id,
-            @RequestParam(required = false) Boolean status,
+            @RequestParam(required = false) String status,
             @RequestParam(required = false) String type,
             @RequestParam(required = false) String groupName,
             Pageable pageable) {
-        return connectService.findWithFilter(pageable, userId, id, status, type, groupName);
+        if (userId != null || id != null || status != null || type != null || groupName != null) {
+            return connectService.findWithFilter(pageable, userId, id, status, type, groupName);
+        } else {
+            List<ConnectDTO> allConnects = connectService.getAll();
+            return new PageImpl<>(allConnects, pageable, allConnects.size());
+        }
     }
 
     @PostMapping
