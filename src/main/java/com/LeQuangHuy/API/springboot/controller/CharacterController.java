@@ -26,7 +26,7 @@ public class CharacterController extends BaseController<CharacterDTO, CharacterF
     }
 
     @GetMapping
-    public Page<CharacterDTO> getConnects(
+    public Page<CharacterDTO> getCharacters(
             @RequestParam(required = false) Long userId,
             @RequestParam(required = false) String characterName,
             Pageable pageable) {
