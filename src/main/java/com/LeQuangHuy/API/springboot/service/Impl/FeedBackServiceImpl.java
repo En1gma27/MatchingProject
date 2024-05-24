@@ -44,6 +44,8 @@ public class FeedBackServiceImpl implements FeedBackService {
     @Override
     public FeedBackDTO update(Long id, FeedBackDTO updatedFeedBackDTO) {
         FeedBack existingFeedBack = feedBackRepository.findById(id).orElse(null);
+        existingFeedBack.setRate(updatedFeedBackDTO.getRate());
+        existingFeedBack.setNote(updatedFeedBackDTO.getNote());
         if (existingFeedBack != null) {
             if (updatedFeedBackDTO.getUserId() != null) {
                 User user = userRepository.findById(updatedFeedBackDTO.getUserId()).orElse(null);
