@@ -51,15 +51,7 @@ public class User extends BaseModel {
 	private List<FeedBack> feedBacks = new ArrayList<>();
 
 	@JsonIgnore
-	@Column(name = "created_at")
-	private LocalDateTime createdAt;
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+	private List<Demand> demands = new ArrayList<>();
 
-	@PrePersist
-	protected void onCreate() {
-		createdAt = LocalDateTime.now();
-	}
-
-	@JsonIgnore
-	@Column(name = "updated_at")
-	private LocalDateTime updatedAt;
 }
