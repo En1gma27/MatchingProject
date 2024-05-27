@@ -19,15 +19,15 @@ public abstract class BaseController<DTO extends BaseDTO, FT extends BaseFilter,
 
 
 
-//    @GetMapping("/{id}")
-//    public ResponseEntity<DTO> getEntityById(@PathVariable("id") Long id) {
-//        DTO entity = service.findById(id);
-//        if (entity != null) {
-//            return ResponseEntity.ok(entity);
-//        } else {
-//            return ResponseEntity.notFound().build();
-//        }
-//    }
+   @GetMapping("/{id}")
+        public ResponseEntity<DTO> getEntityById(@PathVariable("id") Long id) {
+           DTO entity = service.findById(id);
+              if (entity != null) {
+                   return ResponseEntity.ok(entity);
+                } else {
+                return ResponseEntity.notFound().build();
+            }
+    }
 
     @PostMapping
     public ResponseEntity<DTO> createEntity(@RequestBody DTO dto) {
