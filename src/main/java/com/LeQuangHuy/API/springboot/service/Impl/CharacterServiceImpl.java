@@ -1,13 +1,17 @@
 package com.LeQuangHuy.API.springboot.service.Impl;
 
 import com.LeQuangHuy.API.springboot.dto.CharacterDTO;
+import com.LeQuangHuy.API.springboot.dto.ConnectDTO;
 import com.LeQuangHuy.API.springboot.mapper.CharacterMapper;
 import com.LeQuangHuy.API.springboot.model.Character;
+import com.LeQuangHuy.API.springboot.model.Connect;
 import com.LeQuangHuy.API.springboot.repository.CharacterRepository;
 import com.LeQuangHuy.API.springboot.service.CharacterService;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,6 +30,14 @@ public class CharacterServiceImpl implements CharacterService {
     }
 
     @Override
+    public Page<CharacterDTO> findWithFilter(Pageable pageable,
+                                           Long userId,
+                                           String characterName) {
+        Page<Character> pageResult = characterRepository.findWithFilter(pageable,characterName,userId);
+        return pageResult.map(characterMapper::entityToDTO);
+    }
+
+    @Override
     public List<CharacterDTO> getAll() {
         List<Character> characters = characterRepository.findAll();
         return characters.stream().map(characterMapper::entityToDTO).collect(Collectors.toList());
@@ -36,11 +48,6 @@ public class CharacterServiceImpl implements CharacterService {
         return null;
     }
 
-    @Override
-    public List<CharacterDTO> findByCharacterName(String characterName) {
-        List<Character> characters = characterRepository.findByCharacterName(characterName);
-        return characters.stream().map(characterMapper::entityToDTO).collect(Collectors.toList());
-    }
 
     @Override
     public CharacterDTO update(Long id, CharacterDTO updatedCharacterDTO) {

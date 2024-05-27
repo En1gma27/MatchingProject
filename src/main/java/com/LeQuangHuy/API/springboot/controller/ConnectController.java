@@ -1,13 +1,13 @@
 package com.LeQuangHuy.API.springboot.controller;
 
-
 import com.LeQuangHuy.API.springboot.dto.ConnectDTO;
 import com.LeQuangHuy.API.springboot.service.ConnectService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 @RestController
 @RequestMapping("/connects")
 public class ConnectController {
@@ -19,29 +19,30 @@ public class ConnectController {
         this.connectService = connectService;
     }
 
-    @GetMapping
-    public List<ConnectDTO> getConnects(@RequestParam(required = false) Long userId,@RequestParam(required = false) String type) {
-        if (userId != null && type != null) {
-            return connectService.findByUserIdAndType(userId, type);
-        } else if (userId != null) {
-            return connectService.findByUserId(userId);
-        } else if (type != null) {
-            return connectService.findByType(type);
+     @GetMapping
+    public Page<ConnectDTO> getConnects(
+            @RequestParam(required = false) Long userId,
+            @RequestParam(required = false) Long id,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false) String groupName,
+            Pageable pageable) {
+        if (userId != null || id != null || status != null || type != null || groupName != null) {
+            return connectService.findWithFilter(pageable, userId, id, status, type, groupName);
         } else {
-            return connectService.getAll();
+            List<ConnectDTO> allConnects = connectService.getAll();
+            return new PageImpl<>(allConnects, pageable, allConnects.size());
         }
     }
 
-    @PostMapping("/connects")
+    @PostMapping
     public ResponseEntity<ConnectDTO> createConnect(@RequestBody ConnectDTO connectDTO) {
         ConnectDTO savedConnectDTO = connectService.save(connectDTO);
         return ResponseEntity.ok(savedConnectDTO);
     }
 
-
     @DeleteMapping("/{id}")
     public void deleteConnectById(@PathVariable Long id) {
         connectService.deleteById(id);
     }
-
 }
