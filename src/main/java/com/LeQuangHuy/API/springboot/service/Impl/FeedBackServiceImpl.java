@@ -1,11 +1,16 @@
 package com.LeQuangHuy.API.springboot.service.Impl;
-import com.LeQuangHuy.API.springboot.dto.BaseDTO;
 import com.LeQuangHuy.API.springboot.dto.FeedBackDTO;
 import com.LeQuangHuy.API.springboot.mapper.FeedBackMapper;
+import com.LeQuangHuy.API.springboot.model.Connect;
+import com.LeQuangHuy.API.springboot.model.Demand;
 import com.LeQuangHuy.API.springboot.model.FeedBack;
+import com.LeQuangHuy.API.springboot.model.User;
 import com.LeQuangHuy.API.springboot.repository.FeedBackRepository;
+import com.LeQuangHuy.API.springboot.repository.UserRepository;
 import com.LeQuangHuy.API.springboot.service.FeedBackService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,11 +19,13 @@ import java.util.stream.Collectors;
 public class FeedBackServiceImpl implements FeedBackService {
     private final FeedBackRepository feedBackRepository;
     private final FeedBackMapper feedBackMapper;
+    private final UserRepository userRepository;
 
     @Autowired
-    public FeedBackServiceImpl(FeedBackRepository feedBackRepository, FeedBackMapper feedBackMapper) {
+    public FeedBackServiceImpl(FeedBackRepository feedBackRepository, FeedBackMapper feedBackMapper, UserRepository userRepository) {
         this.feedBackRepository= feedBackRepository;
         this.feedBackMapper = feedBackMapper;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -28,33 +35,29 @@ public class FeedBackServiceImpl implements FeedBackService {
     }
 
     @Override
-    public BaseDTO findById(Long id) {
-        return null;
+    public FeedBackDTO findById(Long id) {
+        FeedBack feedBack = feedBackRepository.findById(id).orElse(null);
+        return feedBack != null ? feedBackMapper.entityToDTO(feedBack) : null;
     }
 
-    @Override
-    public BaseDTO update(Long id, BaseDTO updatedDTO) {
-        return null;
-    }
 
     @Override
-    public List<FeedBackDTO> findByUserId(Long userId) {
-        List<FeedBack> feedBacks = feedBackRepository.findByUserId(userId);
-        return feedBacks.stream().map(feedBackMapper::entityToDTO).collect(Collectors.toList());
-    }
-
-    @Override
-    public List<FeedBackDTO> findByRate(Integer  rate) {
-        return feedBackRepository.findByRate(rate).stream()
-                .map(feedBackMapper::entityToDTO)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<FeedBackDTO> findByUserIdAndRate(Long userId, Integer rate) {
-        return feedBackRepository.findByUserIdAndRate(userId,rate).stream()
-                .map(feedBackMapper::entityToDTO)
-                .collect(Collectors.toList());
+    public FeedBackDTO update(Long id, FeedBackDTO updatedFeedBackDTO) {
+        FeedBack existingFeedBack = feedBackRepository.findById(id).orElse(null);
+        existingFeedBack.setRate(updatedFeedBackDTO.getRate());
+        existingFeedBack.setNote(updatedFeedBackDTO.getNote());
+        if (existingFeedBack != null) {
+            if (updatedFeedBackDTO.getUserId() != null) {
+                User user = userRepository.findById(updatedFeedBackDTO.getUserId()).orElse(null);
+                existingFeedBack.setUser(user);
+            } else {
+                existingFeedBack.setUser(null);
+            }
+            FeedBack savedFeedBack = feedBackRepository.save(existingFeedBack);
+            return feedBackMapper.entityToDTO(savedFeedBack);
+        } else {
+            return null;
+        }
     }
 
 
@@ -63,28 +66,33 @@ public class FeedBackServiceImpl implements FeedBackService {
         feedBackRepository.deleteById(id);
     }
 
-    @Override
-    public BaseDTO save(BaseDTO dto) {
-        return null;
-    }
+
 
     @Override
     public FeedBackDTO save(FeedBackDTO feedBackDTO) {
         FeedBack feedBackToSave = feedBackMapper.dtoToEntity(feedBackDTO);
+        if (feedBackDTO.getUserId() != null) {
+            User user = userRepository.findById(feedBackDTO.getUserId()).orElse(null);
+            feedBackToSave.setUser(user);
+        }
         FeedBack savedFeedBack = feedBackRepository.save(feedBackToSave);
         return feedBackMapper.entityToDTO(savedFeedBack);
     }
 
 
     @Override
-    public List<FeedBackDTO> findAllByOrderByRateAsc() {
-        List<FeedBack> feedBacks = feedBackRepository.findAllByOrderByRateAsc();
-        return feedBacks.stream().map(feedBackMapper::entityToDTO).collect(Collectors.toList());
+    public Page<FeedBackDTO> findWithFilterAndSortByRateDesc(Pageable pageable,
+                                                             Long userId,
+                                                             Integer rate) {
+        Page<FeedBack> pageResult = feedBackRepository.findWithFilterAndSortByRateDesc( pageable,rate,userId);
+        return pageResult.map(feedBackMapper::entityToDTO);
     }
 
     @Override
-    public List<FeedBackDTO> findAllByOrderByRateDesc() {
-        List<FeedBack> feedBacks = feedBackRepository.findAllByOrderByRateDesc();
-        return feedBacks.stream().map(feedBackMapper::entityToDTO).collect(Collectors.toList());
+    public Page<FeedBackDTO> findWithFilterAndSortByRateAsc(Pageable pageable,
+                                                            Long userId,
+                                                            Integer rate) {
+        Page<FeedBack> pageResult = feedBackRepository.findWithFilterAndSortByRateAsc(pageable,rate,userId);
+        return pageResult.map(feedBackMapper::entityToDTO);
     }
 }
