@@ -1,7 +1,15 @@
 package com.LeQuangHuy.API.springboot.controller;
 
+import com.LeQuangHuy.API.springboot.dto.ConnectDTO;
+import com.LeQuangHuy.API.springboot.dto.FeedBackDTO;
+import com.LeQuangHuy.API.springboot.dto.UserDTO;
+import com.LeQuangHuy.API.springboot.filter.UserFilter;
 import com.LeQuangHuy.API.springboot.model.User;
 import com.LeQuangHuy.API.springboot.security.service.UserService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -9,41 +17,29 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/users")
-public class UserController {
+public class UserController extends BaseController<UserDTO, UserFilter, User, Long> {
 
     private final UserService userService;
 
     public UserController(UserService userService) {
+        super(userService);
         this.userService = userService;
     }
-
     @GetMapping
-    public ResponseEntity<List<User>> getUsers(@RequestParam(required = false) String name) {
-        if (name != null && !name.isEmpty()) {
-            User user = userService.findByUsername(name).getBody();
-            if (user != null) {
-                return ResponseEntity.ok(List.of(user));
-            } else {
-                return ResponseEntity.notFound().build();
-            }
+    public Page<UserDTO> getUsers(
+            @RequestParam(required = false) String username,
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) String address,
+            @RequestParam(required = false) String type,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        if ( username != null || email != null || address != null || type != null) {
+            return userService.findWithFilter(pageable,username,email,address,type);
         } else {
-            List<User> users = userService.getAllUsers();
-            return ResponseEntity.ok(users);
+            List<UserDTO> allUsers = userService.getAll();
+            return new PageImpl<>(allUsers, pageable, allUsers.size());
         }
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User updatedUser) {
-        ResponseEntity<User> responseEntity = userService.updateUser(id, updatedUser);
-        if (responseEntity != null && responseEntity.getBody() != null) {
-            return ResponseEntity.ok(responseEntity.getBody());
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
-    @DeleteMapping("/{id}")
-    public void deleteUserById(@PathVariable Long id) {
-        userService.deleteUserById(id);
-    }
 }
